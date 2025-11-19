@@ -5,6 +5,11 @@
   --foreground: #171717;
 }
 
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -13,7 +18,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
@@ -38,6 +43,25 @@ body {
     radial-gradient(1000px 800px at 90% 80%, rgba(50, 108, 216, 0.375), transparent 50%),
     linear-gradient(180deg, #0b0b12 0%, #0a0a0a 60%, #0b0b12 100%);
   animation: auroraFloat1 20s ease-in-out infinite alternate;
+}
+
+/* Light theme aurora background */
+[data-theme="light"] .bg-aurora-layer-1 {
+  background:
+    radial-gradient(1000px 800px at 10% 20%, rgba(120, 73, 239, 0.15), transparent 50%),
+    radial-gradient(1000px 800px at 90% 80%, rgba(50, 108, 216, 0.15), transparent 50%),
+    linear-gradient(180deg, #f8f9fa 0%, #ffffff 60%, #f8f9fa 100%);
+}
+
+[data-theme="light"] .bg-aurora-layer-2 {
+  background:
+    radial-gradient(900px 700px at 70% 30%, rgba(119, 167, 255, 0.1), transparent 45%),
+    radial-gradient(900px 700px at 30% 70%, rgba(120, 73, 239, 0.08), transparent 45%);
+}
+
+[data-theme="light"] .bg-aurora-layer-3 {
+  background:
+    radial-gradient(1200px 900px at 50% 50%, rgba(50, 108, 216, 0.06), transparent 60%);
 }
 
 .bg-aurora-layer-2 {
@@ -147,3 +171,5 @@ body {
 .animate-bounce-horizontal {
   animation: bounce-horizontal 1.5s ease-in-out infinite;
 }
+
+
