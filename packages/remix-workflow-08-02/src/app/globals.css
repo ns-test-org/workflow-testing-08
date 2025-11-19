@@ -3,39 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --card-background: #ffffff;
-  --border-color: #e5e7eb;
-  --hover-background: #f3f4f6;
-  --modal-background: #ffffff;
-  --input-background: #ffffff;
-  --input-border: #d1d5db;
-  --button-primary: #3b82f6;
-  --button-primary-hover: #2563eb;
-  --button-secondary: #d1d5db;
-  --button-secondary-hover: #9ca3af;
-  --event-background: #dbeafe;
-  --event-text: #1e40af;
-  --today-background: #dbeafe;
-  --today-text: #2563eb;
-}
-
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card-background: #1f2937;
-  --border-color: #374151;
-  --hover-background: #374151;
-  --modal-background: #1f2937;
-  --input-background: #374151;
-  --input-border: #4b5563;
-  --button-primary: #3b82f6;
-  --button-primary-hover: #2563eb;
-  --button-secondary: #4b5563;
-  --button-secondary-hover: #6b7280;
-  --event-background: #1e40af;
-  --event-text: #dbeafe;
-  --today-background: #1e40af;
-  --today-text: #dbeafe;
 }
 
 @theme inline {
@@ -43,6 +10,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 /* Non-scroll and full-height baseline */
@@ -173,4 +147,3 @@ body {
 .animate-bounce-horizontal {
   animation: bounce-horizontal 1.5s ease-in-out infinite;
 }
-
