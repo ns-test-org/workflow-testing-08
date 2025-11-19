@@ -1,84 +1,189 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-const slogans = [
-  "Turn chats into apps",
-  "Prompt. Ship. Repeat.",
-  "Build anything from a chat",
-  "Ideas → Apps, instantly",
-  "From zero to MVP in minutes",
-  "Your cofounder in the command line",
-  "Draft, iterate, deploy",
-  "Ship faster than you can type",
-  "Design in text, deliver in code",
-  "Dream it. Prompt it. Run it.",
-  "Chat-native app building",
-  "From prompt to product",
-  "One prompt, infinite apps",
-  "Stop scaffolding. Start shipping.",
-  "Prototype at the speed of thought",
-  "Make conversations executable"
-];
+export default function CalendarApp() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [events, setEvents] = useState<{[key: string]: string[]}>({});
+  const [newEvent, setNewEvent] = useState('');
+  const [showEventForm, setShowEventForm] = useState(false);
 
-export default function Landing() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % slogans.length);
-        setIsVisible(true);
-      }, 400);
-    }, 2800);
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    return () => clearInterval(interval);
-  }, []);
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const formatDateKey = (date: Date) => {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  };
+
+  const navigateMonth = (direction: number) => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1));
+  };
+
+  const selectDate = (day: number) => {
+    const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    setSelectedDate(selected);
+    setShowEventForm(true);
+  };
+
+  const addEvent = () => {
+    if (selectedDate && newEvent.trim()) {
+      const dateKey = formatDateKey(selectedDate);
+      setEvents(prev => ({
+        ...prev,
+        [dateKey]: [...(prev[dateKey] || []), newEvent.trim()]
+      }));
+      setNewEvent('');
+      setShowEventForm(false);
+    }
+  };
+
+  const renderCalendarDays = () => {
+    const daysInMonth = getDaysInMonth(currentDate);
+    const firstDay = getFirstDayOfMonth(currentDate);
+    const days = [];
+
+    // Empty cells for days before the first day of the month
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="h-24 border border-gray-200"></div>);
+    }
+
+    // Days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const dateKey = formatDateKey(date);
+      const dayEvents = events[dateKey] || [];
+      const isToday = new Date().toDateString() === date.toDateString();
+
+      days.push(
+        <div
+          key={day}
+          className={`h-24 border border-gray-200 p-1 cursor-pointer hover:bg-blue-50 ${
+            isToday ? 'bg-blue-100' : ''
+          }`}
+          onClick={() => selectDate(day)}
+        >
+          <div className={`font-semibold ${isToday ? 'text-blue-600' : ''}`}>
+            {day}
+          </div>
+          <div className="text-xs mt-1">
+            {dayEvents.slice(0, 2).map((event, index) => (
+              <div key={index} className="bg-blue-200 text-blue-800 px-1 rounded mb-1 truncate">
+                {event}
+              </div>
+            ))}
+            {dayEvents.length > 2 && (
+              <div className="text-gray-500">+{dayEvents.length - 2} more</div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return days;
+  };
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-black text-white">
-      {/* Enhanced animated aurora background layers */}
-      <div className="absolute inset-0 bg-aurora-layer-1" />
-      <div className="absolute inset-0 bg-aurora-layer-2" />
-      <div className="absolute inset-0 bg-aurora-layer-3" />
-      
-      {/* Floating particles overlay */}
-      <div className="absolute inset-0 bg-particles" />
-      
-      {/* Main content - centered */}
-      <main className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-        <h1 className="text-center text-[clamp(28px,6vw,64px)] font-medium tracking-tight mb-4">
-          Turn Chats into Apps
-        </h1>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Calendar App</h1>
         
-        {/* Rotating slogans */}
-        <div className="mt-4 h-8 md:h-10 overflow-hidden flex items-center justify-center">
-          <span
-            className={`inline-block text-center text-[clamp(18px,3vw,32px)] font-light transition-all duration-[400ms] ease-in-out ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-            }`}
-          >
-            {slogans[currentIndex]}
-          </span>
+        {/* Calendar Header */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={() => navigateMonth(-1)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              ← Previous
+            </button>
+            <h2 className="text-2xl font-semibold text-gray-800">
+              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+            </h2>
+            <button
+              onClick={() => navigateMonth(1)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Next →
+            </button>
+          </div>
+
+          {/* Days of week header */}
+          <div className="grid grid-cols-7 gap-0 mb-2">
+            {daysOfWeek.map(day => (
+              <div key={day} className="p-2 text-center font-semibold text-gray-600 bg-gray-100">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar grid */}
+          <div className="grid grid-cols-7 gap-0 border border-gray-200">
+            {renderCalendarDays()}
+          </div>
         </div>
-      </main>
-      
-      {/* Start Prompting arrow pointing left - bottom left */}
-      <div className="absolute left-6 md:left-8 bottom-[5%] z-20 flex items-center gap-3 arrow-point-left">
-        <div className="flex items-center gap-2 text-white/80 font-medium text-sm md:text-base">
-          <svg 
-            className="w-5 h-5 md:w-6 md:h-6 animate-bounce-horizontal" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Start prompting</span>
-        </div>
+
+        {/* Event Form Modal */}
+        {showEventForm && selectedDate && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-96 max-w-90vw">
+              <h3 className="text-xl font-semibold mb-4">
+                Add Event for {selectedDate.toLocaleDateString()}
+              </h3>
+              <input
+                type="text"
+                value={newEvent}
+                onChange={(e) => setNewEvent(e.target.value)}
+                placeholder="Enter event description"
+                className="w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyPress={(e) => e.key === 'Enter' && addEvent()}
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={addEvent}
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  Add Event
+                </button>
+                <button
+                  onClick={() => {
+                    setShowEventForm(false);
+                    setNewEvent('');
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              {/* Show existing events for this date */}
+              {events[formatDateKey(selectedDate)]?.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <h4 className="font-semibold mb-2">Existing Events:</h4>
+                  {events[formatDateKey(selectedDate)].map((event, index) => (
+                    <div key={index} className="bg-gray-100 p-2 rounded mb-2">
+                      {event}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
